@@ -6,6 +6,7 @@ import { ServicoModule } from './servicos/servico.module';
 import { AuthModule } from './auth/auth.module';
 import { AgendamentoModule } from './agendamentos/agendamento.module';
 import { UsuarioModule } from './usuarios/usuario.module';
+import { HorarioModule } from './horarios/horario.module';
 
 @Module({
   imports: [
@@ -31,6 +32,7 @@ import { UsuarioModule } from './usuarios/usuario.module';
     AuthModule,
     AgendamentoModule,
     UsuarioModule,
+    HorarioModule,
   ],
 })
 export class AppModule {}
