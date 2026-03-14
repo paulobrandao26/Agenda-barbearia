@@ -1,16 +1,24 @@
-import { Controller, Get, Post, Patch, Param, Body, Query, UseGuards, Request } from '@nestjs/common'
+import { Controller, Get, Post, Patch, Param, Body, Query } from '@nestjs/common'
 import { AgendamentoService } from './agendamento.service'
-import { Agendamento, StatusAgendamento } from './agendamento.entity'
-import { JwtAuthGuard } from '../auth/jwt-auth.guard'
+import { StatusAgendamento } from './agendamento.entity'
 
 @Controller('agendamentos')
 export class AgendamentoController {
   constructor(private readonly agendamentoService: AgendamentoService) {}
 
   @Post()
-  @UseGuards(JwtAuthGuard)
-  criar(@Body() dados: Partial<Agendamento>, @Request() req) {
-    return this.agendamentoService.criar({ ...dados, clienteId: req.user.id })
+  criar(@Body() dados: {
+    nomeCliente: string
+    telefoneCliente: string
+    barbeiroId: string
+    servicoId: string
+    dataHora: string
+    observacao?: string
+  }) {
+    return this.agendamentoService.criar({
+      ...dados,
+      dataHora: new Date(dados.dataHora),
+    })
   }
 
   @Get('barbeiro/:barbeiroId')
@@ -26,10 +34,12 @@ export class AgendamentoController {
     return this.agendamentoService.listarPorData(barbeiroId, data)
   }
 
-  @Get('meus')
-  @UseGuards(JwtAuthGuard)
-  listarMeus(@Request() req) {
-    return this.agendamentoService.listarPorCliente(req.user.id)
+  @Get('barbeiro/:barbeiroId/horarios')
+  horariosDisponiveis(
+    @Param('barbeiroId') barbeiroId: string,
+    @Query('data') data: string,
+  ) {
+    return this.agendamentoService.horariosDisponiveis(barbeiroId, data)
   }
 
   @Get(':id')
@@ -38,13 +48,11 @@ export class AgendamentoController {
   }
 
   @Patch(':id/status')
-  @UseGuards(JwtAuthGuard)
   atualizarStatus(@Param('id') id: string, @Body() dados: { status: StatusAgendamento }) {
     return this.agendamentoService.atualizarStatus(id, dados.status)
   }
 
   @Patch(':id/cancelar')
-  @UseGuards(JwtAuthGuard)
   cancelar(@Param('id') id: string) {
     return this.agendamentoService.cancelar(id)
   }

@@ -10,7 +10,14 @@ export class AgendamentoService {
     private readonly agendamentoRepository: Repository<Agendamento>,
   ) {}
 
-  async criar(dados: Partial<Agendamento>): Promise<Agendamento> {
+  async criar(dados: {
+    nomeCliente: string
+    telefoneCliente: string
+    barbeiroId: string
+    servicoId: string
+    dataHora: Date
+    observacao?: string
+  }): Promise<Agendamento> {
     const conflito = await this.agendamentoRepository.findOne({
       where: {
         barbeiroId: dados.barbeiroId,
@@ -27,13 +34,6 @@ export class AgendamentoService {
   async listarPorBarbeiro(barbeiroId: string): Promise<Agendamento[]> {
     return this.agendamentoRepository.find({
       where: { barbeiroId },
-      order: { dataHora: 'ASC' },
-    })
-  }
-
-  async listarPorCliente(clienteId: string): Promise<Agendamento[]> {
-    return this.agendamentoRepository.find({
-      where: { clienteId },
       order: { dataHora: 'ASC' },
     })
   }
@@ -67,5 +67,19 @@ export class AgendamentoService {
 
   async cancelar(id: string): Promise<Agendamento> {
     return this.atualizarStatus(id, StatusAgendamento.CANCELADO)
+  }
+
+  async horariosDisponiveis(barbeiroId: string, data: string): Promise<string[]> {
+    const agendamentosDia = await this.listarPorData(barbeiroId, data)
+    const horariosOcupados = agendamentosDia
+      .filter(a => a.status !== StatusAgendamento.CANCELADO)
+      .map(a => new Date(a.dataHora).toLocaleTimeString('pt-BR', { hour: '2-digit', minute: '2-digit' }))
+
+    const todosHorarios = [
+      '08:00', '09:00', '10:00', '11:00',
+      '13:00', '14:00', '15:00', '16:00', '17:00', '18:00',
+    ]
+
+    return todosHorarios.filter(h => !horariosOcupados.includes(h))
   }
 }

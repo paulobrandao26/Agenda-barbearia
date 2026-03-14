@@ -22,12 +22,12 @@ export class Agendamento {
   @PrimaryGeneratedColumn('uuid')
   id: string
 
-  @ManyToOne(() => Usuario, { eager: true })
-  @JoinColumn({ name: 'cliente_id' })
-  cliente: Usuario
+  // Cliente sem conta — só nome e telefone
+  @Column()
+  nomeCliente: string
 
-  @Column({ name: 'cliente_id' })
-  clienteId: string
+  @Column()
+  telefoneCliente: string
 
   @ManyToOne(() => Usuario, { eager: true })
   @JoinColumn({ name: 'barbeiro_id' })
