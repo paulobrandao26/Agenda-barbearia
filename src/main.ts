@@ -9,6 +9,7 @@ async function bootstrap() {
       'http://localhost:5173',
       'http://localhost:3000',
       'http://localhost:3001',
+      'https://barber-brand-frontend.vercel.app',
       process.env.FRONTEND_URL,
     ].filter(Boolean),
     credentials: true,
